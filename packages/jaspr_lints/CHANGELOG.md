@@ -1,6 +1,7 @@
 ## Unreleased patch
 
 - Allow `analyzer` versions 10.x.
+- Enabled `addStyles` and `convertToNestedStyles` assists in client mode projects. 
 
 ## 0.6.0
 
