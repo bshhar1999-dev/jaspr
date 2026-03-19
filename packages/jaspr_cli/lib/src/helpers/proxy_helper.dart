@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
+import 'package:shelf_static/shelf_static.dart';
 
 import '../commands/base_command.dart';
 import '../logging.dart';
@@ -22,9 +23,10 @@ mixin ProxyHelper on BaseCommand {
     final client = http.Client();
     final webdevHandler = proxyHandler(Uri.parse('http://localhost:$webPort'), client: client);
     final flutterHandler = flutterPort != null ? proxyHandler('http://localhost:$flutterPort/', client: client) : null;
+    final generatedHandler = createStaticHandler('.dart_tool/jaspr/generated');
     final allowedFlutterPaths = RegExp(r'^assets|^canvaskit|^packages|.js$|.wasm$');
 
-    final cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add((req) async {
+    final cascade = Cascade().add(_sseProxyHandler(client, webPort, logger)).add(generatedHandler).add((req) async {
       if (req.url.path == r'$jasprMessageHandler') {
         onMessage?.call(jsonDecode(await req.readAsString()));
         return Response.ok(null);

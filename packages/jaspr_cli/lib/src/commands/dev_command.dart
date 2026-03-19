@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 
 import '../dev/chrome.dart';
 import '../dev/client_workflow.dart';
+import '../helpers/css_helper.dart';
 import '../helpers/dart_define_helpers.dart';
 import '../helpers/flutter_helpers.dart';
 import '../helpers/proxy_helper.dart';
@@ -348,7 +349,6 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     final buildArgs = [
       if (release) '--release',
       '--delete-conflicting-outputs',
-      '--define=jaspr_builder:styles_output=jaspr-mode=${project.requireMode.name}',
       if (managedBuildOptions) ...[
         '--define=build_web_compilers:ddc=generate-full-dill=true',
         '--define=build_web_compilers:entrypoint=compiler=$compiler',
@@ -389,6 +389,7 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
         } else {
           logger.write('Rebuilt web assets.', tag: Tag.cli, progress: ProgressState.completed);
         }
+        _runBuildCallback();
       } else if (event.status == BuildStatus.failed) {
         logger.write(
           'Failed building web assets. There is probably more output above.',
@@ -439,6 +440,10 @@ abstract class DevCommand extends BaseCommand with ProxyHelper, FlutterHelper {
     }
 
     return workflow;
+  }
+
+  void _runBuildCallback() {
+    generateCss();
   }
 }
 
